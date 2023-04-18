@@ -1,12 +1,12 @@
 # Use the official Python image.
 # https://hub.docker.com/_/python
-FROM python:3.7-slim
+FROM python:3.7
 
 # Install manually all the missing libraries
 RUN apt-get update
 # Install Python dependencies.
 RUN apt-get update && \
-  apt-get install -yq \
+  apt-get install -y\
     python3 \
     python3-dev \
     python3-pip \
