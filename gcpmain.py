@@ -45,3 +45,7 @@ def hello_world():
     browser.get("https://www.google.com/search?q=headless+horseman&tbm=isch")
     json_object = {'response':True, 'driver':str(browser)}
     return jsonify(json_object) 
+
+
+if __name__ == "__main__":
+    app.run(debug=True,host='0.0.0.0',port=int(os.environ.get('PORT',8080)))
