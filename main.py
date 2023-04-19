@@ -158,14 +158,14 @@ def payment_method(driver):
     driver.find_element(By.ID, value='submitConfirm2').click()
     time.sleep(10)
     
-    alert_text = '' ; [(time.sleep(5), (soup := BeautifulSoup(driver.page_source, 'lxml')))[2] for run in range(5) if alert_text != '' or run == 4 ]
-    print(alert_text)
+    #alert_text = '' ; [(time.sleep(5), (soup := BeautifulSoup(driver.page_source, 'lxml')))[2] for run in range(5) if alert_text != '' or run == 4 ]
+    #print(alert_text)
     
     # ## Close the Browser ##
     #closing_browser = input('Please Press any key to close the browser.')
     driver.close()
 
-    return [driver, alert_text]
+    return [driver, ""]
 ## Running The code After Loggin in ##
 
 @app.route("/")
