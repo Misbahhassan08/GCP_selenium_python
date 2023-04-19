@@ -36,7 +36,7 @@ chrome_options.add_argument("--disable-gpu")
 chrome_options.add_argument("--no-sandbox")
 
 # Initialize a new browser
-browser = webdriver.Chrome(chrome_options=chrome_options)
+browser = webdriver.Chrome(ChromeDriverManager().install(),chrome_options=chrome_options)
 
 
 @app.route("/")
@@ -44,7 +44,3 @@ def hello_world():
     browser.get("https://www.google.com/search?q=headless+horseman&tbm=isch")
     json_object = {'response':True, 'driver':str(browser)}
     return jsonify(json_object) 
-
-
-if __name__ == "__main__":
-    app.run(debug=True,host='0.0.0.0',port=int(os.environ.get('PORT',8080)))
