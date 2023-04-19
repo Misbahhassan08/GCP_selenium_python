@@ -16,7 +16,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from webdriver_manager.chrome import ChromeDriverManager
-import chromedriver_binary  # Adds chromedriver binary to path
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'vnkdjnfjknfl1232#'
@@ -36,9 +36,9 @@ last_name = "Dune"
 # The following options are required to make headless Chrome
 # work in a Docker container
 chrome_options = webdriver.ChromeOptions()
-#chrome_options.add_argument("--headless")
-#chrome_options.add_argument("--disable-gpu")
-#chrome_options.add_argument("--no-sandbox")
+chrome_options.add_argument("--headless")
+chrome_options.add_argument("--disable-gpu")
+chrome_options.add_argument("--no-sandbox")
 
 # Initialize a new browser
 driver = webdriver.Chrome(ChromeDriverManager().install(),chrome_options=chrome_options)
