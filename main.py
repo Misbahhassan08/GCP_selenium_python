@@ -6,7 +6,7 @@ import os
 import time
 
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, send_file
 from flask_cors import CORS, cross_origin
 
 import datetime
@@ -16,7 +16,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from webdriver_manager.chrome import ChromeDriverManager
-
+#import chromedriver_binary  # Adds chromedriver binary to path
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'vnkdjnfjknfl1232#'
@@ -25,25 +25,42 @@ app.app_context().push()
 
 result = "Successful"
 
-quote_number = 123
+quote_number = 'QT00002822031'
 card_type = 'visa'
 card_number = '3566002020360505'
-exp_month = 'jan'
+exp_month = '07 - Jul'
 exp_year = 2023
 ccv_number = 345
 first_name = "ALEXA"
 last_name = "Dune"
+card_type_selector = 1
 # The following options are required to make headless Chrome
 # work in a Docker container
-chrome_options = webdriver.ChromeOptions()
-chrome_options.add_argument("--headless")
-chrome_options.add_argument("--disable-gpu")
-chrome_options.add_argument("--no-sandbox")
+options = webdriver.ChromeOptions()
+options.add_argument("--headless")
+options.add_argument("--disable-gpu")
+options.add_argument("--no-sandbox")
+options.add_argument('--disable-extensions')  # Disables Extensions
+options.add_argument("--disable-software-rasterizer")  # Disables "Lost UI Shared Context GPU Error on Windows"
+options.add_argument("--log-level=3")  # Errors Only
+options.add_argument("--incognito")  # Keeps history and logs clear
+
+options.add_argument("--mute_audio")  # No loud surprises!
+options.add_argument("--no-gpu")  # Disables gpu-based errors (headless)
+options.add_argument('--disable-plugins')  # Disables Extensions
+
+options.add_argument("enable-automation")
+options.add_argument("--disable-infobars")
+options.add_argument("--disable-dev-shm-usage")
+options.add_argument("window-size=1800,1400")
+# Initialize a new browser
+
 
 def payment_method(driver):
     global result
     global quote_number
     global card_type
+    global card_type_selector
     global card_number
     global exp_month
     global exp_year
@@ -64,7 +81,6 @@ def payment_method(driver):
     time.sleep(1.5)
     driver.find_element(By.XPATH, value='//li[@data-qtip="One Time Payment"]').click()
     time.sleep(2)
-
 
     ## Selecting Payment Type ##
     id_attribute_value_payment_plan = soup.find('h2', text='Payment').parent.select_one('input[fieldref="PolicyInput.PaymentPlan"]')['id'].split('-')[0]+'-trigger-picker'
@@ -94,7 +110,7 @@ def payment_method(driver):
 
 
     ################## Card Payment - Automation #######################
-
+    
     ## Selecting - Pay Current Due ##
     driver.find_element(By.XPATH, value = '//label[@class="radio ng-binding"]').click()
     time.sleep(1)
@@ -102,7 +118,7 @@ def payment_method(driver):
     ## Selecting Payment Method - Credit/Debit ##
     driver.find_elements(By.XPATH, value = '//select[@id="paymentMethod"]/option')[-1].click()
     time.sleep(1)
-
+    
     ####### Card Type Selector ############## Card Type Selector #######
     if card_type == 'Visa':
         card_type_selector = 1
@@ -121,13 +137,14 @@ def payment_method(driver):
     time.sleep(0.5)
 
     #### Expiration Month #######
-    exp_month_selection = int(exp_month.split(' -')[0])-1
+    exp_month_selection = 8#int(exp_month.split(' -')[0])-1
     driver.find_elements(By.XPATH, value = '//select[@name="card_expirationMonth"]/option')[exp_month_selection].click()
     time.sleep(0.5)
 
     #### Expiration Year #######
-    year_selection = [next(select.click() for select in driver.find_elements(By.XPATH, '//select[@name="card_expirationYear"]/option') if exp_year == select.text), None]
-    time.sleep(0.5)
+    driver.save_screenshot("3.png")
+    #year_selection = [next(select.click() for select in driver.find_elements(By.XPATH, '//select[@name="card_expirationYear"]/option') if exp_year == select.text), None]
+    #time.sleep(0.5)
 
 
     ### ccv_number ## ### ccv_number ##
@@ -148,41 +165,43 @@ def payment_method(driver):
     ### Use Existing Address ##
     driver.find_element(By.XPATH, value = '//input[@name="chk_useShippingAddress"]').click()
     time.sleep(0.5)
-    
+    driver.save_screenshot("4.png")
     driver.find_element(By.ID, value = 'submitPayment').click()
     time.sleep(3)
 
     driver.find_element(By.ID, value='submitConfirm2').click()
     time.sleep(10)
     
-    #alert_text = '' ; [(time.sleep(5), (soup := BeautifulSoup(driver.page_source, 'lxml')))[2] for run in range(5) if alert_text != '' or run == 4 ]
-    #print(alert_text)
-    
+    alert_text = '' 
+    driver.save_screenshot("5.png")
+    alert_text = '' ; [(time.sleep(5), (soup := BeautifulSoup(driver.page_source, 'lxml')), (alert_text := soup.select_one('.alert').text.strip()))[2] for run in range(5) if alert_text != '' or run == 4 ]
+    print(alert_text)
     # ## Close the Browser ##
     #closing_browser = input('Please Press any key to close the browser.')
-    driver.close()
+    #driver.close()
 
-    return [driver, ""]
+    return [driver, alert_text]
 ## Running The code After Loggin in ##
 
 @app.route("/")
 def hello_world():
     global result
+    global driver
     global quote_number
-    global card_type
     global card_number
     global exp_month
     global exp_year
     global ccv_number
     global first_name
     global last_name
+    global options
 
-    # Initialize a new browser
-    driver = webdriver.Chrome(ChromeDriverManager().install(),chrome_options=chrome_options)
-    driver.get("https://magic.markelamerican.com/")
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()),chrome_options=options)
     driver.implicitly_wait(30)
     driver.maximize_window()
-
+    driver.implicitly_wait(30)
+    driver.get("https://magic.markelamerican.com/")
+    
     driver.find_element(By.XPATH, value='//input[@id="username-inputEl"]').send_keys('bikers')
     time.sleep(1)
     driver.find_element(By.XPATH, value='//input[@id="password-inputEl"]').send_keys('Markel2020!')
@@ -212,46 +231,55 @@ def hello_world():
 
     # Clicking on the first result from the result set ## 
     soup = BeautifulSoup(driver.page_source, 'lxml')
+    
     if soup.select_one('#quoteListLoadQuoteA'):
+        print(f'soup.select_one: DRIVER 1: {driver}')
         driver.find_element(By.ID,value='quoteListLoadQuoteA').click()
+        
+        print(f'soup.select_one: DRIVER 2: {driver}')
         time.sleep(2)
     else:
         policy_available = 0
         print('\nNo policies matching your search were found. If you wish, revise your search criteria and search again.\n')
 
     if policy_available == 1:
-        try:
-            ## Clicking on Submission Button ##
-            driver.find_element(By.LINK_TEXT, value = 'Submission').click()
-            time.sleep(2)
+        
+        
+        driver.find_element(By.LINK_TEXT, value = 'Submission').click()
+        time.sleep(2)
 
-            while True:
-                soup = BeautifulSoup(driver.page_source, 'lxml')
-                if 'Complete Issuance' in soup.text:
-                    print('Payment Page Found.')
-                    break
+        while True:
+            soup = BeautifulSoup(driver.page_source, 'lxml')
+            if 'Complete Issuance' in soup.text:
+                driver.save_screenshot("1.png")
+                print('Payment Page Found.')
+                break
 
-                else:
-                    ## Complete Order ## 
-                    if 'Complete Quote' in soup.text:
-                        
-                        driver.find_element(By.LINK_TEXT, value = 'Complete Quote').click()
-                        time.sleep(2)
-
-                    ## Next Button##
-                    driver.find_element(By.LINK_TEXT, value = 'Next').click()
+            else:
+                ## Complete Order ## 
+                if 'Complete Quote' in soup.text:
+                    driver.save_screenshot("1.png")
+                    driver.find_element(By.LINK_TEXT, value = 'Complete Quote').click()
                     time.sleep(2)
 
-            # driver.switch_to.default_content()
-            driver, result = payment_method(driver)
+                ## Next Button##
+                driver.find_element(By.LINK_TEXT, value = 'Next').click()
+                driver.save_screenshot("2.png")
+                time.sleep(2)
+
+        # driver.switch_to.default_content()
+        driver, result = payment_method(driver)
             
-        except Exception as error:
-            print(error)
-            #input('Please Press any key to close the browser.')
-            result = f"failed : {error}"
-            driver.close()
+        driver.close()
     else:
-        input('Please Press any key to close the browser.')
+        #input('Please Press any key to close the browser.')
         driver.close()
     json_object = {'response':True, 'result':str(result), 'driver':str(driver)}
     return jsonify(json_object)
+@app.route("/<number>")
+def return_image(number):
+    name = f"{number}.png"
+    return send_file(name)
+    pass
+#if __name__ == "__main__":
+#    app.run()
