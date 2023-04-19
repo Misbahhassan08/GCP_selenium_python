@@ -4,8 +4,11 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import os
 import time
+
+
 from flask import Flask, jsonify
 from flask_cors import CORS, cross_origin
+
 import datetime
 import requests
 from selenium import webdriver
@@ -33,9 +36,9 @@ last_name = "Dune"
 # The following options are required to make headless Chrome
 # work in a Docker container
 chrome_options = webdriver.ChromeOptions()
-chrome_options.add_argument("--headless")
-chrome_options.add_argument("--disable-gpu")
-chrome_options.add_argument("--no-sandbox")
+#chrome_options.add_argument("--headless")
+#chrome_options.add_argument("--disable-gpu")
+#chrome_options.add_argument("--no-sandbox")
 
 # Initialize a new browser
 driver = webdriver.Chrome(ChromeDriverManager().install(),chrome_options=chrome_options)
@@ -155,7 +158,7 @@ def payment_method(driver):
     driver.find_element(By.ID, value='submitConfirm2').click()
     time.sleep(10)
     
-    alert_text = '' ; [(time.sleep(5), (soup := BeautifulSoup(driver.page_source, 'lxml')), (alert_text := soup.select_one('.alert').text.strip()))[2] for run in range(5) if alert_text != '' or run == 4 ]
+    alert_text = '' ; [(time.sleep(5), (soup := BeautifulSoup(driver.page_source, 'lxml')))[2] for run in range(5) if alert_text != '' or run == 4 ]
     print(alert_text)
     
     # ## Close the Browser ##
@@ -179,7 +182,7 @@ def hello_world():
 
     driver.get("https://magic.markelamerican.com/")
     driver.implicitly_wait(30)
-    #driver.maximize_window()
+    driver.maximize_window()
 
     driver.find_element(By.XPATH, value='//input[@id="username-inputEl"]').send_keys('bikers')
     time.sleep(1)
