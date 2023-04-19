@@ -33,7 +33,6 @@ last_name = "Dune"
 chrome_options = webdriver.ChromeOptions()
 chrome_options.add_argument("--headless")
 chrome_options.add_argument("--disable-gpu")
-chrome_options.add_argument("window-size=1024,768")
 chrome_options.add_argument("--no-sandbox")
 
 # Initialize a new browser
@@ -48,4 +47,4 @@ def hello_world():
 
 
 if __name__ == "__main__":
-    app.run(debug=True,host='0.0.0.0',port=int(os.environ.get('PORT',8082)))
+    app.run(debug=True,host='0.0.0.0',port=int(os.environ.get('PORT',8080)))
