@@ -25,7 +25,7 @@ app.app_context().push()
 
 result = "Successful"
 
-quote_number = 4453
+quote_number = 123
 card_type = 'visa'
 card_number = '3566002020360505'
 exp_month = 'jan'
@@ -39,9 +39,6 @@ chrome_options = webdriver.ChromeOptions()
 chrome_options.add_argument("--headless")
 chrome_options.add_argument("--disable-gpu")
 chrome_options.add_argument("--no-sandbox")
-
-# Initialize a new browser
-driver = webdriver.Chrome(ChromeDriverManager().install(),chrome_options=chrome_options)
 
 def payment_method(driver):
     global result
@@ -180,6 +177,8 @@ def hello_world():
     global first_name
     global last_name
 
+    # Initialize a new browser
+    driver = webdriver.Chrome(ChromeDriverManager().install(),chrome_options=chrome_options)
     driver.get("https://magic.markelamerican.com/")
     driver.implicitly_wait(30)
     driver.maximize_window()
