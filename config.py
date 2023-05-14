@@ -25,9 +25,9 @@ options = webdriver.ChromeOptions()
 if showBrowser:
     pass 
 elif showBrowser == False:
-    #options.add_argument("--headless")
-    #options.add_argument("--disable-gpu")
-    #options.add_argument("--no-sandbox")
+    options.add_argument("--headless")
+    options.add_argument("--disable-gpu")
+    options.add_argument("--no-sandbox")
     options.add_argument('--disable-extensions')  # Disables Extensions
     options.add_argument("--disable-software-rasterizer")  # Disables "Lost UI Shared Context GPU Error on Windows"
     options.add_argument("--log-level=3")  # Errors Only
