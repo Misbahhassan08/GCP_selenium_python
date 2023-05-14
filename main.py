@@ -88,7 +88,7 @@ def payment_method(driver, quote_number, card_type, card_number,
 
 
     ################## Card Payment - Automation #######################
-    time.sleep(3)
+    time.sleep(10)
     if payment_method_selected == 'Recurring Payments':
         driver.find_element(By.ID, value='paymentOptionDiv').click()
         time.sleep(1.5)
@@ -130,8 +130,8 @@ def payment_method(driver, quote_number, card_type, card_number,
     #### Expiration Year #######
     if saving:
         driver.save_screenshot("3.png")
-    #year_selection = [next(select.click() for select in driver.find_elements(By.XPATH, '//select[@name="card_expirationYear"]/option') if exp_year == select.text), None]
-    #time.sleep(0.5)
+    year_selection = [next(select.click() for select in driver.find_elements(By.XPATH, '//select[@name="card_expirationYear"]/option') if exp_year == select.text), None]
+    time.sleep(0.5)
 
 
     ### ccv_number ## ### ccv_number ##
@@ -270,14 +270,16 @@ def running_job(quote_number, card_type, card_number,
 
 @app.route("/")
 def hello_world():
-    return running_job(mydist['quote_number'], mydist['card_type'], mydist['card_number'], 
-                    mydist['exp_year'], mydist['exp_month'], mydist['ccv_number'], mydist['first_name'], mydist['last_name'],
-                    mydist['payment_method_selected'], mydist['additional_payment_plan'])
+    #return running_job(mydist['quote_number'], mydist['card_type'], mydist['card_number'], 
+    #                mydist['exp_year'], mydist['exp_month'], mydist['ccv_number'], mydist['first_name'], mydist['last_name'],
+    #                mydist['payment_method_selected'], mydist['additional_payment_plan'])
+
+    return jsonify({"response": True,"result": "Please Send Post request to endpoint /api/runJob!"})
 
 @app.route("/api/runJob", methods=['POST', 'GET'])
 def runpostrequest():
     if request.method == 'GET':
-        return jsonify({"response": False,"result": "Plese Send Post request here!"})
+        return jsonify({"response": False,"result": "Please Send Post request here!"})
     
     elif request.method == 'POST':
         quote_number = request.form["quote_number"]
