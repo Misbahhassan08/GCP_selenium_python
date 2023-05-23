@@ -42,3 +42,15 @@ elif showBrowser == False:
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("window-size=1800,1400")
 # Initialize a new browser
+
+#google cloud -----------------------------------
+
+SERVICE_ACCOUNT_FILE = 'credentials.json'
+SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
+
+
+# here enter the id of your google sheet
+SAMPLE_SPREADSHEET_ID = '10W8SED6Hn26pOq65dSfWSg6-Ne78WBPjcnMJGrb6_w4'
+WORKSHEET_NAME = 'logs!'
+SAMPLE_RANGE_NAME = 'A:J'
+
